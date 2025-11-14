@@ -9,7 +9,7 @@ const { initDatabase } = require("../db");
 
 const PORT = process.env.PORT || 3000;
 
-app.use("/api", sensorRouter);
+app.use("/api/sensor", sensorRouter);
 
 const startServer = async () => {
   try {
