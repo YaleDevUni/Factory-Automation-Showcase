@@ -2,7 +2,12 @@ const sensorProvider = require("./sensorProvider");
 const { SensorDataModel } = require("../../db");
 
 const saveSensorData = async () => {
-  const sensorData = sensorProvider.get();
+  const sensorData = await sensorProvider.get();
+  if (!Array.isArray(sensorData) || sensorData.length === 0) {
+    console.warn("No sensor data available to persist");
+    return;
+  }
+
   for (const data of sensorData) {
     await SensorDataModel.create({
       machineId: data.machine_id,
