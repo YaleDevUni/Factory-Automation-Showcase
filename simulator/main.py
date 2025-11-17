@@ -69,8 +69,9 @@ async def create_opcua_server():
                     for prop, (node, min_v, max_v) in props.items():
                         random_value = round(random.uniform(min_v, max_v), 2)
                         await node.write_value(random_value)
+                        print(f"Updated {prop} to {random_value}")
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(random.random() * 2 + 1)
 
 
 if __name__ == "__main__":

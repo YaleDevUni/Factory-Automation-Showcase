@@ -39,6 +39,22 @@ const getSensorData = () => {
   }));
 };
 
+const subscribe = (handler) => {
+  if (typeof handler !== "function") {
+    throw new Error("A handler function is required to subscribe to mock data");
+  }
+
+  const intervalMs = Number(process.env.MOCK_SENSOR_INTERVAL || 1000);
+  const timer = setInterval(() => {
+    Promise.resolve(handler(getSensorData())).catch((error) =>
+      console.error("Mock sensor handler failed", error)
+    );
+  }, intervalMs);
+
+  return () => clearInterval(timer);
+};
+
 module.exports = {
   getSensorData,
+  subscribe,
 };
