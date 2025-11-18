@@ -1,14 +1,17 @@
 const Sequelize = require("sequelize");
-const SensorData = require("../models/sensordata");
+const SensorData = require("./models/sensordata");
 const dotenv = require("dotenv");
+const { resolveStoragePath, defaultStorage } = require("./utils/storage");
+
 dotenv.config();
-// alert if process.env.DATABASE_URL is not set
-if (!process.env.DIALECT && !process.env.STORAGE) {
-  throw new Error("DIALECT and STORAGE are not set check db/index.js");
-}
+
+const dialect = process.env.DIALECT || "sqlite";
+const storageEnv = process.env.SHARED_DB_STORAGE || process.env.STORAGE;
+const storage = resolveStoragePath(storageEnv) || defaultStorage;
+
 const sequelize = new Sequelize({
-  dialect: process.env.DIALECT,
-  storage: process.env.STORAGE,
+  dialect,
+  storage,
 });
 
 const SensorDataModel = SensorData(sequelize, Sequelize.DataTypes);
