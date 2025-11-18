@@ -28,15 +28,18 @@ const persistSensorBatch = async (sensorData) => {
   }
 
   const recordsToPersist = [];
+  const bypassDeduplication =
+    process.env.DISABLE_DEDUPLICATION?.toLowerCase() === "true";
 
   for (const data of sensorData) {
-    const snapshotKey = serializeRecord(data);
-    const previousSnapshot = lastPersistedSnapshots.get(data.machine_id);
-    if (snapshotKey === previousSnapshot) {
-      continue;
+    if (!bypassDeduplication) {
+      const snapshotKey = serializeRecord(data);
+      const previousSnapshot = lastPersistedSnapshots.get(data.machine_id);
+      if (snapshotKey === previousSnapshot) {
+        continue;
+      }
+      lastPersistedSnapshots.set(data.machine_id, snapshotKey);
     }
-
-    lastPersistedSnapshots.set(data.machine_id, snapshotKey);
 
     recordsToPersist.push({
       machineId: data.machine_id,

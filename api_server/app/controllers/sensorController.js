@@ -49,60 +49,6 @@ router.get("/status", async (req, res) => {
   }
 });
 
-router.get("/stream", async (req, res) => {
-  res.set({
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive",
-  });
 
-  if (typeof res.flushHeaders === "function") {
-    res.flushHeaders();
-  } else if (typeof res.flush === "function") {
-    res.flush();
-  }
-
-  const writeEvent = (event, data) => {
-    res.write(`event: ${event}\n`);
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
-  };
-
-  writeEvent("connected", { message: "Subscribed to sensor data feed" });
-
-  let lastSentAt = null;
-  try {
-    const snapshot = await fetchLatestRecords(20, { ascending: true });
-    if (snapshot.length > 0) {
-      const plainSnapshot = toPlainObjects(snapshot);
-      lastSentAt = plainSnapshot[plainSnapshot.length - 1].createdAt;
-      writeEvent("snapshot", plainSnapshot);
-    }
-  } catch (error) {
-    writeEvent("error", { message: error.message });
-  }
-
-  const heartbeatInterval = setInterval(() => {
-    res.write(": keep-alive\n\n");
-  }, 15000);
-
-  const pollInterval = setInterval(async () => {
-    try {
-      const records = await fetchRecordsAfter(lastSentAt);
-      if (records.length > 0) {
-        const plainRecords = toPlainObjects(records);
-        lastSentAt = plainRecords[plainRecords.length - 1].createdAt;
-        writeEvent("records", plainRecords);
-      }
-    } catch (error) {
-      writeEvent("error", { message: error.message });
-    }
-  }, 2000);
-
-  req.on("close", () => {
-    clearInterval(heartbeatInterval);
-    clearInterval(pollInterval);
-    res.end();
-  });
-});
 
 module.exports = router;

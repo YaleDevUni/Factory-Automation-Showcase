@@ -21,6 +21,7 @@ let sequelize;
 const normalizedConfig = {
   ...config,
   storage: resolveStoragePath(config.storage),
+  logging: false,
 };
 
 if (normalizedConfig.use_env_variable) {

@@ -12,6 +12,7 @@ const storage = resolveStoragePath(storageEnv) || defaultStorage;
 const sequelize = new Sequelize({
   dialect,
   storage,
+  logging: false,
 });
 
 const SensorDataModel = SensorData(sequelize, Sequelize.DataTypes);

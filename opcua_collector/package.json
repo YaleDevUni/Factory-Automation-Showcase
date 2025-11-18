@@ -17,7 +17,8 @@
     "node-opcua-client": "^2.158.0",
     "sequelize": "^6.37.7",
     "socket.io": "^4.8.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "sequelize-cli": "^6.6.3"

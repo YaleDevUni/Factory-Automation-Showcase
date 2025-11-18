@@ -29,6 +29,9 @@ let factoryStructure = null; // array of machine descriptors
 const snapshotByMachineId = new Map(); // machineId -> { descriptor, values: Map }
 const nodeToProperty = new Map(); // nodeId string -> { machineId, propertyName }
 const activeSubscribers = new Set();
+const pendingRecords = new Map(); // machineId -> materializedRecord
+let debounceTimeout = null;
+const DEBOUNCE_INTERVAL = SAMPLING_INTERVAL; // Use SAMPLING_INTERVAL for debouncing
 
 const numericIdFromString = (text) => {
   let hash = 0;
@@ -171,6 +174,30 @@ const buildMachineDescriptors = async (session) => {
   return machines;
 };
 
+const FACTORY_STRUCTURE_CONFIG = {
+  Line1: {
+    Machine1: {
+      speed: { min: 3.0, max: 7.0 },
+      temperature: { min: 20.0, max: 90.0 },
+      pressure: { min: 1.0, max: 5.0 },
+    },
+    Machine2: {
+      rpm: { min: 800, max: 1500 },
+      torque: { min: 10, max: 30 },
+    },
+  },
+  Line2: {
+    Machine3: {
+      flow_rate: { min: 50, max: 120 },
+      vibration: { min: 0.1, max: 5.0 },
+    },
+    Machine4: {
+      humidity: { min: 10, max: 50 },
+      temperature: { min: 25, max: 80 },
+    },
+  },
+};
+
 const initializeSnapshot = (machines) => {
   snapshotByMachineId.clear();
   nodeToProperty.clear();
@@ -198,15 +225,34 @@ const materializeRecord = (machineId) => {
 
   const { descriptor, values } = entry;
 
+  // Find machine config from FACTORY_STRUCTURE_CONFIG
+  const machineConfig =
+    FACTORY_STRUCTURE_CONFIG[descriptor.line_name]?.[descriptor.machine_name];
+
   return {
     machine_id: descriptor.machine_id,
     machine_name: descriptor.machine_name,
     line_id: descriptor.line_id,
-    properties: descriptor.properties.map((property) => ({
-      property_name: property.property_name,
-      unit: property.unit,
-      value: values.get(property.property_name) ?? null,
-    })),
+    properties: descriptor.properties.map((property) => {
+      const value = values.get(property.property_name) ?? null;
+      let alarm = false;
+      if (
+        machineConfig &&
+        machineConfig[property.property_name] &&
+        value !== null
+      ) {
+        const propConfig = machineConfig[property.property_name];
+        if (value >= propConfig.max * 0.9) {
+          alarm = true;
+        }
+      }
+      return {
+        property_name: property.property_name,
+        unit: property.unit,
+        value: value,
+        alarm: alarm, // Add alarm field
+      };
+    }),
   };
 };
 
@@ -220,6 +266,15 @@ const notifySubscribers = (records) => {
       console.error("Sensor subscriber handler failed", error)
     );
   });
+};
+
+const flushPendingRecords = () => {
+  if (pendingRecords.size === 0) {
+    return;
+  }
+  const recordsToNotify = Array.from(pendingRecords.values());
+  notifySubscribers(recordsToNotify);
+  pendingRecords.clear();
 };
 
 const handleMonitoredValue = (nodeKey, value) => {
@@ -236,7 +291,11 @@ const handleMonitoredValue = (nodeKey, value) => {
   entry.values.set(linkage.propertyName, value);
   const record = materializeRecord(linkage.machineId);
   if (record) {
-    notifySubscribers([record]);
+    pendingRecords.set(linkage.machineId, record);
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+    debounceTimeout = setTimeout(flushPendingRecords, DEBOUNCE_INTERVAL);
   }
 };
 
