@@ -16,44 +16,44 @@ const RealtimeAlarmList: React.FC = () => {
   const [localError, setLocalError] = useState<string | null>(null); // Local error state
 
   // Effect for real-time alarm details polling
-  // useEffect(() => {
-  //   let intervalId: NodeJS.Timeout | null = null;
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
 
-  //   const getRealtimeAlarmDetails = async () => {
-  //     if (!selectedMachineId) {
-  //       setRealtimeAlarmDetails([]);
-  //       return;
-  //     }
-  //     setRealtimeAlarmDetailsLoading(true);
-  //     setLocalError(null); // Use local error state
-  //     try {
-  //       const details = await fetchRealtimeAlarmDetails(selectedMachineId);
-  //       setRealtimeAlarmDetails(details);
-  //     } catch (err: any) {
-  //       setLocalError(err.message); // Use local error state
-  //     } finally {
-  //       setRealtimeAlarmDetailsLoading(false);
-  //     }
-  //   };
+    const getRealtimeAlarmDetails = async () => {
+      if (!selectedMachineId) {
+        setRealtimeAlarmDetails([]);
+        return;
+      }
+      // setRealtimeAlarmDetailsLoading(true);
+      setLocalError(null); // Use local error state
+      try {
+        const details = await fetchRealtimeAlarmDetails(selectedMachineId);
+        setRealtimeAlarmDetails(details);
+      } catch (err: any) {
+        setLocalError(err.message); // Use local error state
+      } finally {
+        setRealtimeAlarmDetailsLoading(false);
+      }
+    };
 
-  //   if (isAutoFetchingEnabled && selectedMachineId) {
-  //     getRealtimeAlarmDetails(); // Initial fetch
-  //     intervalId = setInterval(getRealtimeAlarmDetails, 1000); // Poll every 1 second
-  //   } else {
-  //     setRealtimeAlarmDetails([]); // Clear data if auto-fetching is disabled or no machine selected
-  //   }
+    // if (isAutoFetchingEnabled && selectedMachineId) {
+      // getRealtimeAlarmDetails(); // Initial fetch
+    intervalId = setInterval(getRealtimeAlarmDetails, 1000); // Poll every 1 second
+    // } else {
+    //   setRealtimeAlarmDetails([]); // Clear data if auto-fetching is disabled or no machine selected
+    // }
 
-  //   return () => {
-  //     if (intervalId) {
-  //       clearInterval(intervalId);
-  //     }
-  //   };
-  // }, [
-  //   selectedMachineId,
-  //   // isAutoFetchingEnabled,
-  //   // setRealtimeAlarmDetails,
-  //   // setRealtimeAlarmDetailsLoading,
-  // ]);
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [
+    selectedMachineId,
+    // isAutoFetchingEnabled,
+    // setRealtimeAlarmDetails,
+    // setRealtimeAlarmDetailsLoading,
+  ]);
 
   if (localError)
     return <div className="text-red-500">Error: {localError}</div>; // Display local error

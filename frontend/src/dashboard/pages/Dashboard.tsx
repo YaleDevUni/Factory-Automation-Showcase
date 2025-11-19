@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
     setSelectedMachineId(event.target.value);
   };
 
-  if (overviewLoading || initialRealtimeLoading || realtimeAlarmDetailsLoading)
+  if (overviewLoading || initialRealtimeLoading )
     return <div className="p-4">Loading dashboard...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
