@@ -51,3 +51,43 @@ export const fetchRealtimePropertyHistory = async (
   }
   return response.json();
 };
+
+export const fetchRealtimeOverview = async (
+  machineId: string,
+  lineId: string | null = null
+) => {
+  let url = `${API_BASE_URL}/realtime/overview/${machineId}`;
+  const params = new URLSearchParams();
+  if (lineId) {
+    params.append("lineId", lineId);
+  }
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
+export const fetchRealtimeAlarmDetails = async (
+  machineId: string,
+  lineId: string | null = null
+) => {
+  let url = `${API_BASE_URL}/realtime/alarms/${machineId}`;
+  const params = new URLSearchParams();
+  if (lineId) {
+    params.append("lineId", lineId);
+  }
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};

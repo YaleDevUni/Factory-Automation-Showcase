@@ -271,9 +271,102 @@ const fetchRealtimePropertyHistory = async (
   return chartData;
 };
 
+const fetchRealtimeOverview = async (machineId, lineId = null) => {
+  const now = new Date();
+  const threeMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
+
+  const whereConditions = {
+    machineId,
+    createdAt: {
+      [Op.gte]: threeMinutesAgo,
+      [Op.lte]: now,
+    },
+  };
+
+  if (lineId) {
+    whereConditions.lineId = lineId;
+  }
+
+  const latestRecord = await SensorDataModel.findOne({
+    where: whereConditions,
+    order: [["createdAt", "DESC"]], // Get the most recent record
+  });
+
+  if (!latestRecord) {
+    return {
+      machineId,
+      lineId,
+      message: "No real-time data found for this machine in the last 3 minutes.",
+    };
+  }
+
+  let alarmCount = 0;
+  const latestPropertyValues = {};
+
+  latestRecord.properties.forEach((prop) => {
+    if (prop.alarm) {
+      alarmCount++;
+    }
+    latestPropertyValues[prop.property_name] = prop.value;
+  });
+
+  return {
+    machineId: latestRecord.machineId,
+    machineName: latestRecord.machineName,
+    lineId: latestRecord.lineId,
+    timestamp: latestRecord.createdAt,
+    alarmCount,
+    latestPropertyValues,
+  };
+};
+
+const fetchRealtimeAlarmDetails = async (machineId, lineId = null) => {
+  const now = new Date();
+  const threeMinutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
+
+  const whereConditions = {
+    machineId,
+    createdAt: {
+      [Op.gte]: threeMinutesAgo,
+      [Op.lte]: now,
+    },
+  };
+
+  if (lineId) {
+    whereConditions.lineId = lineId;
+  }
+
+  const records = await SensorDataModel.findAll({
+    where: whereConditions,
+    order: [["createdAt", "DESC"]], // Get most recent first
+  });
+
+  const alarmDetails = [];
+
+  records.forEach(record => {
+    record.properties.forEach(prop => {
+      if (prop.alarm) {
+        alarmDetails.push({
+          timestamp: record.createdAt,
+          machineId: record.machineId,
+          machineName: record.machineName,
+          lineId: record.lineId,
+          propertyName: prop.property_name,
+          propertyValue: prop.value,
+          alarmMessage: prop.alarm_message || `Alarm triggered for ${prop.property_name}`,
+        });
+      }
+    });
+  });
+
+  return alarmDetails;
+};
+
 module.exports = {
   fetchPropertyHistory,
   fetchOverviewAnalytics,
   fetchMachineSummary,
   fetchRealtimePropertyHistory,
+  fetchRealtimeOverview,
+  fetchRealtimeAlarmDetails, // Export the new function
 };

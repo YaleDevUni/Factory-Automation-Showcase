@@ -5,6 +5,8 @@ const {
   fetchOverviewAnalytics,
   fetchMachineSummary,
   fetchRealtimePropertyHistory, // Added fetchRealtimePropertyHistory
+  fetchRealtimeOverview, // Added fetchRealtimeOverview
+  fetchRealtimeAlarmDetails, // Added fetchRealtimeAlarmDetails
 } = require("../services/analyticsService");
 
 // GET /api/analytics/overview
@@ -13,6 +15,42 @@ router.get("/overview", async (req, res) => {
     const period = req.query.period || "3m"; // e.g., '1h', '24h', '7d', '30d'
     const analytics = await fetchOverviewAnalytics(period);
     res.status(200).json(analytics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET /api/analytics/realtime/overview/:machineId
+router.get("/realtime/overview/:machineId", async (req, res) => {
+  try {
+    const machineId = req.params.machineId;
+    const lineId = req.query.lineId || null;
+    const overview = await fetchRealtimeOverview(machineId, lineId);
+    res.status(200).json(overview);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET /api/analytics/realtime/alarms/:machineId
+router.get("/realtime/alarms/:machineId", async (req, res) => {
+  try {
+    const machineId = req.params.machineId;
+    const lineId = req.query.lineId || null;
+    const alarms = await fetchRealtimeAlarmDetails(machineId, lineId);
+    res.status(200).json(alarms);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET /api/analytics/realtime/overview/:machineId
+router.get("/realtime/overview/:machineId", async (req, res) => {
+  try {
+    const machineId = req.params.machineId;
+    const lineId = req.query.lineId || null;
+    const overview = await fetchRealtimeOverview(machineId, lineId);
+    res.status(200).json(overview);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

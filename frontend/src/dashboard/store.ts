@@ -11,6 +11,11 @@ interface AnalyticsState {
   selectedMachineId: string | null;
   machines: any[]; // Added missing machines state
   properties: string[]; // Added missing properties state
+  realtimeOverviewData: any | null; // New state for real-time overview
+  realtimeOverviewLoading: boolean; // New state for real-time overview loading
+  isAutoFetchingEnabled: boolean; // New state for auto-fetching toggle
+  realtimeAlarmDetails: any[]; // New state for real-time alarm details
+  realtimeAlarmDetailsLoading: boolean; // New state for real-time alarm details loading
 
   setOverviewLoading: (loading: boolean) => void; // Renamed from setLoading
   setChartsLoading: (loading: boolean) => void; // New action for charts loading
@@ -22,6 +27,11 @@ interface AnalyticsState {
   setAllPropertyHistoryData: (data: { [propertyName: string]: any[] }) => void; // New action
   setMachines: (machines: any[]) => void;
   setProperties: (properties: string[]) => void;
+  setRealtimeOverviewData: (data: any) => void; // New action
+  setRealtimeOverviewLoading: (loading: boolean) => void; // New action
+  setIsAutoFetchingEnabled: (enabled: boolean) => void; // New action
+  setRealtimeAlarmDetails: (details: any[]) => void; // New action
+  setRealtimeAlarmDetailsLoading: (loading: boolean) => void; // New action
 }
 
 export const useAnalyticsStore = create<AnalyticsState>((set) => ({
@@ -35,6 +45,11 @@ export const useAnalyticsStore = create<AnalyticsState>((set) => ({
   selectedMachineId: null,
   machines: [],
   properties: [],
+  realtimeOverviewData: null, // Initial state for real-time overview
+  realtimeOverviewLoading: false, // Initial state for real-time overview loading
+  isAutoFetchingEnabled: true, // Initial state for auto-fetching toggle
+  realtimeAlarmDetails: [], // Initial state for real-time alarm details
+  realtimeAlarmDetailsLoading: false, // Initial state for real-time alarm details loading
 
   setOverviewLoading: (loading) => set({ overviewLoading: loading }), // Updated action
   setChartsLoading: (loading) => set({ chartsLoading: loading }), // New action
@@ -46,4 +61,11 @@ export const useAnalyticsStore = create<AnalyticsState>((set) => ({
   setAllPropertyHistoryData: (data) => set({ allPropertyHistoryData: data }), // New action
   setMachines: (machines) => set({ machines }),
   setProperties: (properties) => set({ properties }),
+  setRealtimeOverviewData: (data) => set({ realtimeOverviewData: data }), // New action
+  setRealtimeOverviewLoading: (loading) =>
+    set({ realtimeOverviewLoading: loading }), // New action
+  setIsAutoFetchingEnabled: (enabled) =>
+    set({ isAutoFetchingEnabled: enabled }), // New action
+  setRealtimeAlarmDetails: (details) => set({ realtimeAlarmDetails: details }), // New action
+  setRealtimeAlarmDetailsLoading: (loading) => set({ realtimeAlarmDetailsLoading: loading }), // New action
 }));

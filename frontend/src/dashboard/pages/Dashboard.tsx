@@ -3,9 +3,11 @@ import { useAnalyticsStore } from "../store";
 import {
   fetchOverviewAnalytics,
   fetchMachineSummary,
-  fetchRealtimePropertyHistory, // Import fetchRealtimePropertyHistory
+  fetchRealtimePropertyHistory,
 } from "../../shared/api/analyticsApi";
 import RealtimePropertyLineChart from "../components/RealtimePropertyLineChart";
+import RealtimeOverview from "../components/RealtimeOverview"; // Import RealtimeOverview component
+import RealtimeAlarmList from "../components/RealtimeAlarmList"; // Import RealtimeAlarmList component
 
 const Dashboard: React.FC = () => {
   const {
@@ -18,6 +20,7 @@ const Dashboard: React.FC = () => {
     selectedMachineId,
     machines,
     properties,
+    isAutoFetchingEnabled, // Get from store
     setOverviewData,
     setMachineSummaryData,
     setOverviewLoading,
@@ -27,6 +30,8 @@ const Dashboard: React.FC = () => {
     setSelectedMachineId,
     setMachines,
     setProperties,
+    setIsAutoFetchingEnabled, // Get from store
+    realtimeAlarmDetailsLoading, // Get from store
   } = useAnalyticsStore();
   console.log(
     "Dashboard Render: selectedMachineId:",
@@ -35,8 +40,11 @@ const Dashboard: React.FC = () => {
     properties
   );
 
-  const [isAutoFetchingEnabled, setIsAutoFetchingEnabled] = useState(false);
-  const [initialRealtimeData, setInitialRealtimeData] = useState<{ [propertyName: string]: any[] }>({});
+  // Removed local isAutoFetchingEnabled state
+
+  const [initialRealtimeData, setInitialRealtimeData] = useState<{
+    [propertyName: string]: any[];
+  }>({});
   const [initialRealtimeLoading, setInitialRealtimeLoading] = useState(false);
 
   // Fetch overview data on component mount and when selectedPeriod changes
@@ -92,7 +100,7 @@ const Dashboard: React.FC = () => {
             propName,
             selectedMachineId,
             null, // lineId
-            null  // lastTimestamp to get initial 3 minutes
+            null // lastTimestamp to get initial 3 minutes
           );
           allData[propName] = data;
         }
@@ -115,11 +123,13 @@ const Dashboard: React.FC = () => {
     setSelectedMachineId(event.target.value);
   };
 
-  if (overviewLoading || initialRealtimeLoading) return <div className="p-4">Loading dashboard...</div>;
+  if (overviewLoading || initialRealtimeLoading || realtimeAlarmDetailsLoading)
+    return <div className="p-4">Loading dashboard...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
-  const propertiesWithData = properties.filter(propName =>
-    initialRealtimeData[propName] && initialRealtimeData[propName].length > 0
+  const propertiesWithData = properties.filter(
+    (propName) =>
+      initialRealtimeData[propName] && initialRealtimeData[propName].length > 0
   );
 
   return (
@@ -162,7 +172,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Auto-Fetching Toggle Button */}
-        <button
+        {/* <button
           onClick={() => setIsAutoFetchingEnabled(!isAutoFetchingEnabled)}
           className={`px-4 py-2 rounded ${
             isAutoFetchingEnabled
@@ -171,34 +181,13 @@ const Dashboard: React.FC = () => {
           }`}
         >
           {isAutoFetchingEnabled ? "Stop Auto-Fetch" : "Start Auto-Fetch"}
-        </button>
+        </button> */}
       </div>
 
-      {overviewData && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">Total Records</h2>
-            <p className="text-3xl">{overviewData.totalRecords}</p>
-          </div>
-          {machineSummaryData && selectedMachineId && (
-            <div className="bg-white p-4 rounded shadow">
-              <h2 className="text-lg font-semibold">
-                {machineSummaryData.machineName} Records
-              </h2>
-              <p className="text-3xl">{overviewData.totalRecords}</p>
-            </div>
-          )}
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">Machines</h2>
-            <p className="text-3xl">{overviewData.machines.length}</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">Total Lines</h2>
-            <p className="text-3xl">{overviewData.lines.length}</p>
-          </div>
-        </div>
-      )}
+      {/* Real-time Overview Component */}
+      <RealtimeOverview />
 
+      {/* Existing Machine Summary Section (can be removed or integrated if desired) */}
       {machineSummaryData && selectedMachineId && (
         <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-2">
@@ -240,7 +229,6 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {console.log("Rendering Charts: selectedMachineId:", selectedMachineId)}
       {selectedMachineId && propertiesWithData.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {propertiesWithData.map((propName) => (
@@ -260,6 +248,9 @@ const Dashboard: React.FC = () => {
           </div>
         )
       )}
+
+      {/* Real-time Alarm List Component */}
+      <RealtimeAlarmList />
     </div>
   );
 };
