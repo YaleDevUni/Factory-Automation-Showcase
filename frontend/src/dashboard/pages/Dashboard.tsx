@@ -32,6 +32,7 @@ const Dashboard: React.FC = () => {
     setProperties,
     setIsAutoFetchingEnabled, // Get from store
     realtimeAlarmDetailsLoading, // Get from store
+    setAllPropertyHistoryData, // Add this line
   } = useAnalyticsStore();
   console.log(
     "Dashboard Render: selectedMachineId:",
@@ -105,6 +106,7 @@ const Dashboard: React.FC = () => {
           allData[propName] = data;
         }
         setInitialRealtimeData(allData);
+        setAllPropertyHistoryData(allData);
       } catch (err: any) {
         setError(err.message);
       } finally {

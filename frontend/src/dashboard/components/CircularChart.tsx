@@ -30,7 +30,7 @@ const CircularChart: React.FC<CircularChartProps> = ({ data, title }) => {
   return (
     <div className="bg-white p-4 rounded shadow">
       <h3 className="text-md font-semibold mb-2">{title}</h3>
-      <ResponsiveContainer width="100%" height={150}>
+      <ResponsiveContainer width="100%" height={200} minWidth={400}>
         <PieChart>
           <Pie
             data={filteredData}

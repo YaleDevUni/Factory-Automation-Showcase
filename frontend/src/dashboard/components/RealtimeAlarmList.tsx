@@ -1,7 +1,7 @@
 import { fetchRealtimeAlarmDetails } from "../../shared/api/analyticsApi";
 import CircularChart from "./CircularChart";
 import { useAnalyticsStore } from "../store";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
 interface Alarm {
   timestamp: string;
@@ -40,7 +40,7 @@ const RealtimeAlarmList: React.FC = () => {
             normalCount: history.length,
             alarmCount: 0,
           };
-        },
+        }
       );
 
       // Subtract alarm counts from realtimeAlarmDetails
@@ -65,7 +65,15 @@ const RealtimeAlarmList: React.FC = () => {
         Object.entries(statusMap).map(([propertyName, counts]) => ({
           propertyName,
           ...counts,
-        })),
+        }))
+      );
+      // console.log(statusMap); // Removed console.log
+
+      setPropertyStatusData(
+        Object.entries(statusMap).map(([propertyName, counts]) => ({
+          propertyName,
+          ...counts,
+        }))
       );
     };
 
@@ -123,6 +131,10 @@ const RealtimeAlarmList: React.FC = () => {
     return acc;
   }, {} as Record<string, Alarm[]>);
 
+  const filteredPropertyStatusData = propertyStatusData.filter(
+    (data) => data.normalCount > 0 || data.alarmCount > 0
+  );
+
   return (
     <>
       {selectedMachineId && (
@@ -136,7 +148,7 @@ const RealtimeAlarmList: React.FC = () => {
               <p className="h-4 bg-gray-200 rounded w-full mb-1"></p>
               <p className="h-4 bg-gray-200 rounded w-full mb-1"></p>
             </div>
-          ) : Object.keys(groupedAlarms).length > 0 ? (
+          ) : Object.keys(groupedAlarms).length > 0 || filteredPropertyStatusData.length > 0 ? (
             <div className="flex flex-wrap gap-4">
               <div className="flex overflow-x-auto gap-4 flex-grow">
                 {Object.entries(groupedAlarms).map(([propertyName, alarms]) => (
@@ -161,7 +173,7 @@ const RealtimeAlarmList: React.FC = () => {
                 ))}
               </div>
               <div className="flex flex-wrap gap-4 justify-center">
-                {propertyStatusData.map((data) => (
+                {filteredPropertyStatusData.map((data) => (
                   <CircularChart
                     key={data.propertyName}
                     title={`Status for ${data.propertyName}`}
