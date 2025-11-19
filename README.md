@@ -6,7 +6,7 @@
 
 ## 시스템 아키텍처
 
-![시스템 아키텍처](./public/architecture_diagram_v1.png)
+![시스템 아키텍처](./public/arc_diagram_v2.png)
 
 본 시스템은 확장성과 유지보수성을 고려하여 여러 독립적인 마이크로서비스로 구성되어 있습니다.
 
