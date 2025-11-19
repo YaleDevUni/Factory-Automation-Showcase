@@ -140,7 +140,7 @@ const RealtimeAlarmList: React.FC = () => {
       {selectedMachineId && (
         <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">
-            Real-time Alarms for {selectedMachineId}
+            Alarms for {selectedMachineId}
           </h2>
           {realtimeAlarmDetailsLoading ? (
             <div className="animate-pulse">

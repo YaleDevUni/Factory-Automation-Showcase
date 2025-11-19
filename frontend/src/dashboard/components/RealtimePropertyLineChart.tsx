@@ -113,7 +113,7 @@ const RealtimePropertyLineChart: React.FC<RealtimePropertyLineChartProps> = ({
   return (
     <div className="bg-white p-4 rounded shadow mb-6">
       <h2 className="text-lg font-semibold mb-2">
-        Real-time {propName} for {machineId}
+        {propName} for {machineId}
       </h2>
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart

@@ -60,7 +60,7 @@ const RealtimeOverview: React.FC = () => {
       {realtimeOverviewData && selectedMachineId && (
         <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-2">
-            Real-time Overview:{" "}
+           Overview:{" "}
             {realtimeOverviewData.machineName || selectedMachineId}
           </h2>
           {realtimeOverviewData.message ? (
