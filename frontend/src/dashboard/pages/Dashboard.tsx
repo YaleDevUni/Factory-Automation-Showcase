@@ -68,11 +68,11 @@ const Dashboard: React.FC = () => {
     getOverviewData();
   }, [
     selectedPeriod,
-    setOverviewData,
-    setMachines,
-    setProperties,
-    setOverviewLoading,
-    setError,
+    // setOverviewData,
+    // setMachines,
+    // setProperties,
+    // setOverviewLoading,
+    // setError,
   ]);
 
   // Effect to automatically select the first machine if available
@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
       setSelectedMachineId(machines[0].machineId);
       console.log("Auto-selecting first machine:", machines[0].machineId);
     }
-  }, [machines, selectedMachineId, setSelectedMachineId]);
+  }, [machines, selectedMachineId]);
 
   // Effect to fetch initial real-time data for all properties
   useEffect(() => {
@@ -113,7 +113,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchAllInitialRealtimeData();
-  }, [selectedMachineId, properties, setError]); // Dependencies for this useEffect
+  }, [selectedMachineId, properties]); // Dependencies for this useEffect
 
   const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPeriod(event.target.value);

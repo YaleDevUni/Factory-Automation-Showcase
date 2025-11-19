@@ -50,9 +50,9 @@ const RealtimeAlarmList: React.FC = () => {
   //   };
   // }, [
   //   selectedMachineId,
-  //   isAutoFetchingEnabled,
-  //   setRealtimeAlarmDetails,
-  //   setRealtimeAlarmDetailsLoading,
+  //   // isAutoFetchingEnabled,
+  //   // setRealtimeAlarmDetails,
+  //   // setRealtimeAlarmDetailsLoading,
   // ]);
 
   if (localError)

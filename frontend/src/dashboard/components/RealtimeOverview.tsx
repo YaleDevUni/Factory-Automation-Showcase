@@ -49,8 +49,8 @@ const RealtimeOverview: React.FC = () => {
   }, [
     selectedMachineId,
     isAutoFetchingEnabled,
-    setRealtimeOverviewData,
-    setRealtimeOverviewLoading,
+    // setRealtimeOverviewData,
+    // setRealtimeOverviewLoading,
   ]);
 
   // if (realtimeOverviewLoading) return <div className="p-4">Loading real-time overview...</div>;
