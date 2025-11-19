@@ -22,19 +22,29 @@ export const fetchMachineSummary = async (
   return response.json();
 };
 
-export const fetchPropertyHistory = async (
+
+
+export const fetchRealtimePropertyHistory = async (
   propertyName: string,
   machineId: string | null = null,
   lineId: string | null = null,
-  period: string = "24h"
+  lastTimestamp: string | null = null
 ) => {
-  let url = `${API_BASE_URL}/property/${propertyName}/history?period=${period}`;
+  let url = `${API_BASE_URL}/realtime/${propertyName}/history`;
+  const params = new URLSearchParams();
   if (machineId) {
-    url += `&machineId=${machineId}`;
+    params.append("machineId", machineId);
   }
   if (lineId) {
-    url += `&lineId=${lineId}`;
+    params.append("lineId", lineId);
   }
+  if (lastTimestamp) {
+    params.append("lastTimestamp", lastTimestamp);
+  }
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

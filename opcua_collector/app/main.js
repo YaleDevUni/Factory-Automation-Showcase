@@ -47,9 +47,10 @@ const startServer = async () => {
     // Broadcast data to WebSocket clients
     await subscribeToSensorStream((records) => {
       if (records && records.length > 0) {
-        // The record is an array with a single machine object
-        const machine = records[0];
-        updatedMachines.set(machine.machine_id, machine);
+        // The provider now sends an array of machine objects
+        records.forEach(machine => {
+          updatedMachines.set(machine.machine_id, machine);
+        });
       }
 
       clearTimeout(debounceTimer);
